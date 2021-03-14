@@ -1,8 +1,18 @@
+from src.main_db import MainDB
+from dotenv import load_dotenv
+
 BATCH_SIZE = 10
+OLD_PATH_PREFIX = "images"
+NEW_PATH_PREFIX = "avatar"
 
 def get_batch_from_id(_id=0):
-    print("Query DB for id > _id and LIMIT BATCH_SIZE")
-    return [i for i in range(BATCH_SIZE)]
+    batch = MainDB().get_batch_from_id_with_prefix(
+        batch_size=BATCH_SIZE,
+        _id=_id,
+        prefix=OLD_PATH_PREFIX
+    )
+    print(batch)
+    return batch
 
 def copy_batch(batch):
     for migration in batch:
@@ -28,4 +38,5 @@ def run():
 
 
 if __name__ == '__main__':
+    load_dotenv()
     run()
