@@ -5,7 +5,7 @@ This is a lightweight version of the Asset Migrator. A second attempt to do a si
 The steps I will follow are:
 
 1. Creation of the happy path flow without iteration [DONE]
-1. Create the local environment for development [IN PROGRESS]
+1. Create the local environment for development [DONE]
 1. Implementation of methods to do real stuff
 1. Create iteration loop for all migrations
 1. Implement basic error handling
