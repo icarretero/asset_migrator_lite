@@ -1,4 +1,5 @@
 from src.main_db import MainDB
+from src.aws_helper import AWSHelper
 from dotenv import load_dotenv
 
 BATCH_SIZE = 10
@@ -14,8 +15,15 @@ def get_batch_from_id(_id=0):
     print(batch)
     return batch
 
-def copy_batch(batch):
+def migrate_batch(batch):
+    helper = AWSHelper()
     for migration in batch:
+        source_key = migration[1]
+        destination_key = migration[1].replace(
+            OLD_PATH_PREFIX,
+            NEW_PATH_PREFIX
+        )
+        helper.copy_key(source_key, destination_key)
         print("Copy item: {item}".format(item=migration))
 
 def update_path(batch):
@@ -31,7 +39,7 @@ def run():
     batch = get_batch_from_id()
     # If batch size is larger than 0
     if len(batch) > 0:
-        copy_batch(batch)
+        migrate_batch(batch)
         update_path(batch)
         delete_batch(batch)
     # next batch
