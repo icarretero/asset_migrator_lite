@@ -1,7 +1,5 @@
 import boto3
 import botocore.exceptions
-from dotenv import load_dotenv
-
 
 class AWSHelperException(Exception):
     pass

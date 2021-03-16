@@ -36,8 +36,7 @@ def handle_main_db_exceptions(method):
         try:
             return method(*v, **kw)
         except MainDBConnectionError as e:
-            raise e
-            #raise CriticalError("Connection Error with DB. Review credentials")
+            raise CriticalError("Connection Error with DB. Review credentials")
         except MainDBException:
             raise CriticalError("Error in DB connector")
     return wrapper
