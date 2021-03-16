@@ -1,47 +1,67 @@
+
+from src.base import (
+    Job,
+    CriticalError,
+    handle_aws_exceptions,
+    handle_main_db_exceptions
+)
 from src.main_db import MainDB
-from src.aws_helper import AWSHelper
+from src.aws_helper import (
+    AWSHelper,
+    AWSHelperNotFoundError
+)
+
 from dotenv import load_dotenv
-from dataclasses import dataclass
 
 BATCH_SIZE = 10
 OLD_PATH_PREFIX = "images"
 NEW_PATH_PREFIX = "avatar"
-@dataclass
-class Job():
-    job_id: int
-    old_key: str
-    new_key: str
 
-def generate_batch_from_raw(jobs_raw):
+
+
+def generate_batch_from_raw(batch_raw):
     batch = []
-    for job in jobs_raw:
+    for row in batch_raw:
         batch.append(Job(
-            job[0],
-            job[1],
-            job[1].replace(
+            row[0],
+            row[1],
+            row[1].replace(
                 OLD_PATH_PREFIX,
                 NEW_PATH_PREFIX
             )
         ))
     return batch
 
-def get_batch_from_id(_id=0):
+
+@handle_main_db_exceptions
+def get_batch_from_database(min_id):
     jobs_raw = MainDB().get_batch_from_id_with_prefix(
         batch_size=BATCH_SIZE,
-        _id=_id,
+        _id=min_id,
         prefix=OLD_PATH_PREFIX
     )
-    batch = generate_batch_from_raw(jobs_raw)
+    return jobs_raw
+
+
+def get_batch_from_id(min_id=0):
+    batch_raw = get_batch_from_database(min_id)
+    batch = generate_batch_from_raw(batch_raw)
     print(batch)
     return batch
 
+
+@handle_aws_exceptions
 def migrate_batch(batch):
     helper = AWSHelper()
     for job in batch:
         source_key = job.old_key
         destination_key = job.new_key
         print("Copy item: {item}".format(item=job))
-        helper.copy_key(source_key, destination_key)
+        try:
+            helper.copy_key(source_key, destination_key)
+        except AWSHelperNotFoundError:
+            batch.remove(job)
+
 
 def update_path(batch):
     db = MainDB()
@@ -52,13 +72,21 @@ def update_path(batch):
             path=job.new_key
         )
 
+
 def delete_batch(batch):
     helper = AWSHelper()
     for job in batch:
         print("Testing item {item}".format(item=job))
-        helper.check_key(job.new_key)
+        try:
+            helper.check_key(job.new_key)
+        except AWSHelperNotFoundError:
+            batch.remove(job)
         print("Deleting item {item}".format(item=job))
-        helper.delete_key(job.old_key)
+        try:
+            helper.delete_key(job.old_key)
+        except AWSHelperNotFoundError:
+            batch.remove(job)
+
 
 def run():
     last_id = 0
@@ -75,4 +103,8 @@ def run():
 
 if __name__ == '__main__':
     load_dotenv()
-    run()
+    try:
+        run()
+    except CriticalError as e:
+        print(e)
+        exit(1)

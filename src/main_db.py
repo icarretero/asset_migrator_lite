@@ -1,8 +1,27 @@
-from src.maria_db import MariaDB, MariaDBException
+from src.maria_db import (
+    MariaDB,
+    MariaDBException,
+    MariaDBConnectionError
+)
 
 
 class MainDBException(Exception):
     pass
+
+
+class MainDBConnectionError(MainDBException):
+    pass
+
+
+def handle_exceptions(method):
+    def wrapper(*v, **kw):
+        try:
+            return method(*v, **kw)
+        except MariaDBConnectionError as e:
+            raise MainDBConnectionError(e)
+        except MariaDBException as e:
+            raise MariaDBException("Unhandled DB error") from e
+    return wrapper
 
 
 class MainDB:
@@ -13,13 +32,13 @@ class MainDB:
     PATH_KEY = "path"
 
     def __init__(self):
-        try:
-            self.database = MariaDB(self.DB_NAME)
-        except MariaDBException as e:
-            raise MainDBException(
-                "Database Error performing connection"
-            ) from e
+        self._create_db()
 
+    @handle_exceptions
+    def _create_db(self):
+        self.database = MariaDB(self.DB_NAME)
+
+    @handle_exceptions
     def get_batch_from_id_with_prefix(self, batch_size, _id, prefix):
         query = (
             "SELECT {id_key}, {path_key} "
@@ -35,14 +54,10 @@ class MainDB:
             batch_size=batch_size,
             _id=_id
         )
-        try:
-            jobs = self.database.select(query)
-        except MariaDBException as e:
-            raise MainDBException(
-                "DataBase Error performing query"
-            ) from e
+        jobs = self.database.select(query)
         return jobs
 
+    @handle_exceptions
     def update_path(self, _id, path):
         query = (
             # "UPDATE LOW_PRIORITY {table_name} "
@@ -56,11 +71,4 @@ class MainDB:
             path=path,
             _id=_id
         )
-        print(query)
-        try:
-            jobs = self.database.update(query)
-        except MariaDBException as e:
-            raise MainDBException(
-                "DataBase Error performing query"
-            ) from e
-        return jobs
+        self.database.update(query)

@@ -6,6 +6,25 @@ class MariaDBException(Exception):
     pass
 
 
+class MariaDBConnectionError(MariaDBException):
+    def __init__(self, message):
+        message = "Error establishing connection with DB -> {message}".format(
+            message=message
+        )
+        super().__init__(message)
+
+
+def handle_exceptions(method):
+    def wrapper(*v, **kw):
+        try:
+            return method(*v, **kw)
+        except mariadb.OperationalError as e:
+            raise MariaDBConnectionError(e)
+        except mariadb.Error as e:
+            raise MariaDBException(e)
+    return wrapper
+
+
 class MariaDB():
 
     USER = os.getenv('MYSQL_USER', 'root')
@@ -18,36 +37,31 @@ class MariaDB():
         self.conn = self._get_connection(db_name)
         self.cursor = self._get_cursor()
 
+    @handle_exceptions
     def _get_connection(self, db_name):
-        try:
-            conn = mariadb.connect(
-                user=self.USER,
-                password=self.PWD,
-                host=self.HOST,
-                port=self.PORT,
-                database=db_name,
-            )
-        except mariadb.Error as e:
-            raise MariaDBException(e)
+        conn = mariadb.connect(
+            user=self.USER,
+            password=self.PWD,
+            host=self.HOST,
+            port=self.PORT,
+            database=db_name,
+        )
         return conn
 
     def _get_cursor(self):
         return self.conn.cursor()
 
+    @handle_exceptions
     def close(self):
         self.conn.close()
 
+    @handle_exceptions
     def select(self, query):
-        try:
-            self.cursor.execute(query)
-            results = self.cursor.fetchall()
-        except mariadb.Error as e:
-            raise MariaDBException(e)
+        self.cursor.execute(query)
+        results = self.cursor.fetchall()
         return results
 
+    @handle_exceptions
     def update(self, query):
-        try:
-            self.cursor.execute(query)
-            self.conn.commit()
-        except mariadb.Error as e:
-            raise MariaDBException(e)
+        self.cursor.execute(query)
+        self.conn.commit()
