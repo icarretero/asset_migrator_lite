@@ -25,3 +25,35 @@ class AWSHelper():
             self.s3.meta.client.copy(copy_source, self.NEW_BUCKET, destination_key)
         except botocore.exceptions.ClientError:
             raise AWSHelperException('Error copying key')
+
+    def check_key(self, key):
+        bucket = self.NEW_BUCKET
+        data = {
+            'Bucket': bucket,
+            'Key': key
+        }
+        try:
+            self.s3.meta.client.head_object(**data)
+        except botocore.exceptions.ClientError:
+            raise AWSHelperException(
+                'Could not find object: {bucket}/{key}'.format(
+                    bucket,
+                    key
+                )
+            )
+
+    def delete_key(self, key):
+        bucket = self.OLD_BUCKET
+        data = {
+            'Bucket': bucket,
+            'Key': key
+        }
+        try:
+            self.s3.meta.client.delete_object(**data)
+        except botocore.exceptions.ClientError:
+            raise AWSHelperException(
+                'Could not delete object: {bucket}/{key}'.format(
+                    bucket,
+                    key
+                )
+            )

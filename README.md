@@ -6,7 +6,7 @@ The steps I will follow are:
 
 1. Creation of the happy path flow without iteration [DONE]
 1. Create the local environment for development [DONE]
-1. Implementation of methods to do real stuff [IN PROGRESS]
+1. Implementation of methods to do real stuff [DONE]
 1. Create iteration loop for all migrations
 1. Implement basic error handling
 1. Save current status and resume operations

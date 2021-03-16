@@ -53,9 +53,12 @@ def update_path(batch):
         )
 
 def delete_batch(batch):
-    for migration in batch:
-        print("Testing item {item}".format(item=migration))
-        print("Deleting item {item}".format(item=migration))
+    helper = AWSHelper()
+    for job in batch:
+        print("Testing item {item}".format(item=job))
+        helper.check_key(job.new_key)
+        print("Deleting item {item}".format(item=job))
+        helper.delete_key(job.old_key)
 
 def run():
     # Get first batch
