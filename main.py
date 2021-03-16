@@ -61,14 +61,16 @@ def delete_batch(batch):
         helper.delete_key(job.old_key)
 
 def run():
-    # Get first batch
-    batch = get_batch_from_id()
-    # If batch size is larger than 0
-    if len(batch) > 0:
+    last_id = 0
+    while True:
+        batch = get_batch_from_id(last_id)
+        # If batch size is larger than 0
+        if len(batch) == 0:
+            break
+        last_id = batch[-1].job_id
         migrate_batch(batch)
         update_path(batch)
         delete_batch(batch)
-    # next batch
 
 
 if __name__ == '__main__':
