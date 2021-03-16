@@ -9,6 +9,7 @@ The steps I will follow are:
 1. Implementation of methods to do real stuff [DONE]
 1. Create iteration loop for all migrations [DONE]
 1. Implement basic error handling [DONE]
+1. Implement basic logging [DONE]
 1. Save current status and resume operations
 1. Config as files/vars
 1. Conteinarization
