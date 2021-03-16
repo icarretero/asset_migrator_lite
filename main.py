@@ -12,7 +12,8 @@ from src.aws_helper import (
     AWSHelperNotFoundError
 )
 
-from dotenv import load_dotenv
+# Used for local development but not in Docker
+#from dotenv import load_dotenv
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
@@ -170,7 +171,7 @@ def run():
 
 
 if __name__ == '__main__':
-    load_dotenv()
+    # load_dotenv()
     logging.info("Starting migration!")
     try:
         run()
