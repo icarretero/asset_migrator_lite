@@ -19,7 +19,7 @@ class AWSHelper():
     def copy_key(self, source_key, destination_key):
         copy_source = {
             'Bucket': self.OLD_BUCKET,
-            'Key': 'holi'
+            'Key': source_key
         }
         try:
             self.s3.meta.client.copy(copy_source, self.NEW_BUCKET, destination_key)
