@@ -43,5 +43,24 @@ class MainDB:
             ) from e
         return jobs
 
-    def update_jobs(self):
-        pass
+    def update_path(self, _id, path):
+        query = (
+            # "UPDATE LOW_PRIORITY {table_name} "
+            "UPDATE {table_name} "
+            "SET {path_key}='{path}' "
+            "WHERE {id_key} = {_id}; "
+        ).format(
+            id_key=self.ID_KEY,
+            path_key=self.PATH_KEY,
+            table_name=self.TABLE_NAME,
+            path=path,
+            _id=_id
+        )
+        print(query)
+        try:
+            jobs = self.database.update(query)
+        except MariaDBException as e:
+            raise MainDBException(
+                "DataBase Error performing query"
+            ) from e
+        return jobs

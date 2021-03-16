@@ -44,7 +44,13 @@ def migrate_batch(batch):
         helper.copy_key(source_key, destination_key)
 
 def update_path(batch):
+    db = MainDB()
     print("Transaction updating {items} rows".format(items=len(batch)))
+    for job in batch:
+        db.update_path(
+            _id=job.job_id,
+            path=job.new_key
+        )
 
 def delete_batch(batch):
     for migration in batch:

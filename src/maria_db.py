@@ -44,3 +44,10 @@ class MariaDB():
         except mariadb.Error as e:
             raise MariaDBException(e)
         return results
+
+    def update(self, query):
+        try:
+            self.cursor.execute(query)
+            self.conn.commit()
+        except mariadb.Error as e:
+            raise MariaDBException(e)
