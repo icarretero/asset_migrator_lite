@@ -16,19 +16,14 @@ push:
 
 run:
 	docker run \
-	-e MYSQL_HOST=$(MYSQL_HOST) \
-	-e MYSQL_PWD=$(MYSQL_PWD) \
-	-e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
-	-e AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
+	--env-file .env.local \
 	$(REMOTE_REPOSITORY)/$(IMAGE_NAME):$(IMAGE_TAG)
 
 run-local:
 	docker run \
+	--env-file .env.local \
 	--add-host=host.docker.internal:host-gateway \
 	-e MYSQL_HOST=host.docker.internal \
-	-e MYSQL_PWD=$(MYSQL_PWD) \
-	-e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
-	-e AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
 	$(REMOTE_REPOSITORY)/$(IMAGE_NAME):$(IMAGE_TAG)
 
 .PHONY: build push run run-local
