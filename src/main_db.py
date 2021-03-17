@@ -1,3 +1,4 @@
+import os
 from src.maria_db import (
     MariaDB,
     MariaDBException,
@@ -26,10 +27,10 @@ def handle_exceptions(method):
 
 class MainDB:
 
-    DB_NAME = "assets"
-    TABLE_NAME = "assets"
-    ID_KEY = "entry_id"
-    PATH_KEY = "path"
+    DB_NAME = os.getenv('MYSQL_DB', 'assets')
+    TABLE_NAME = os.getenv('MYSQL_TABLE_NAME', 'assets')
+    ID_KEY = os.getenv('MYSQL_ID_KEY', 'entry_id')
+    PATH_KEY = os.getenv('MYSQL_PATH_KEY', 'path')
 
     def __init__(self):
         self._create_db()

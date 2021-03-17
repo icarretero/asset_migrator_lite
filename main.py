@@ -1,5 +1,5 @@
 import logging
-
+import os
 from src.base import (
     Job,
     CriticalError,
@@ -17,9 +17,9 @@ from src.aws_helper import (
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
-BATCH_SIZE = 10
-OLD_PATH_PREFIX = "images"
-NEW_PATH_PREFIX = "avatar"
+BATCH_SIZE = int(os.getenv('BATCH_SIZE', 10))
+OLD_PATH_PREFIX = os.getenv('OLD_PATH_PREFIX', 'images')
+NEW_PATH_PREFIX = os.getenv('NEW_PATH_PREFIX', 'avatar')
 
 
 

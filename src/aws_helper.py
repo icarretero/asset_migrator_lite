@@ -1,3 +1,4 @@
+import os
 import boto3
 import botocore.exceptions
 
@@ -39,8 +40,8 @@ def handle_exceptions(method):
 
 class AWSHelper():
 
-    OLD_BUCKET = 'asset-migrator-legacy-s3'
-    NEW_BUCKET = 'asset-migrator-production-s3'
+    OLD_BUCKET = os.getenv('AWS_OLD_BUCKET', 'asset-migrator-legacy-s3')
+    NEW_BUCKET = os.getenv('AWS_NEW_BUCKET', 'asset-migrator-production-s3')
 
     def __init__(self):
         try:

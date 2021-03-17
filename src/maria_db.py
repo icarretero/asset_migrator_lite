@@ -29,7 +29,6 @@ class MariaDB():
 
     USER = os.getenv('MYSQL_USER', 'root')
     PWD = os.getenv('MYSQL_PWD')
-    DATABASE = "assets"
     HOST = os.getenv('MYSQL_HOST', '127.0.0.1')
     PORT = os.getenv('MYSQL_PORT', 3306)
 
